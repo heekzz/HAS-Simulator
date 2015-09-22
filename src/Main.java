@@ -38,7 +38,7 @@ public class Main {
 				System.out.println();
 			}
 			
-			
+			// Hahah nu är det inte samma igen!
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
