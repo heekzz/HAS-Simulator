@@ -39,6 +39,7 @@ public class Main {
 			}
 			
 			// Hahah nu är det inte samma igen!
+			// Haha jo det är det lol ava
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
