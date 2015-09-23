@@ -8,7 +8,10 @@ import javax.swing.JLabel;
 
 
 public class Main {
-
+	private static final int minBuf = 4;
+	private static final int maxBuf = 6;
+	private static int availableBandwidth;
+	
 	public static void main (String args[]) {
 		read("log.log");
 		
@@ -30,12 +33,16 @@ public class Main {
 		try {
 			br = new BufferedReader(new FileReader(fileName));
 			String s;
+			int count = 1;
 			while((s = br.readLine()) != null) {
 				String[] data = s.split(" ");
-				for (int i = 0; i < data.length; i++) {
-					System.out.print(data[i] + "---");
-				}
-				System.out.println();
+//				for (int i = 0; i < data.length; i++) {
+//					System.out.print(data[i] + "---");
+//				}
+				int bit = Integer.parseInt(data[4])*8;
+				int kbit = bit/1000;
+				availableBandwidth = kbit;
+				System.out.println(count++ + ": " + kbit + " Kbit/s");
 			}
 			
 			br.close();
