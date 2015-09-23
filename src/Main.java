@@ -38,8 +38,6 @@ public class Main {
 				System.out.println();
 			}
 			
-			// Hahah nu är det inte samma igen!
-			///hahah
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
