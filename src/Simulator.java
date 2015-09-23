@@ -10,23 +10,24 @@ public class Simulator {
     private int[] bandwidthHistory = new int[565];
     private int[] requestedQuality = new int[565];
 
-    // Method that reads the file and splits up the String.
-    // The last two columns will be used in another method to determine
-    // the download speed.
-    private void ReadFile() throws IOException{
 
-        BufferedReader reader = new BufferedReader(new FileReader(
-                "log.log"));
-        String line = null;
-        int index = 0;
-        while ((line = reader.readLine()) != null) {
-            String[] parts = line.split("\\s+");
-            bandwidthHistory[index] = CalculateBandwidth(Integer
-                    .parseInt(parts[4]), Integer.parseInt(parts[5]));
-            index++;
-        }
-        PrintResults(bandwidthHistory);
+    public static void main (String args[]) throws IOException {
+        Simulator sim = new Simulator();
+        VideoPlayer player = new VideoPlayer();
+        sim.read("lol.log");
     }
+
+    public void read(String fileName) throws IOException{
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        String s;
+        int index = 0;
+        while((s = br.readLine()) != null) {
+            String[] data = s.split(" ");
+            bandwidthHistory[index] = (Integer.parseInt(data[4]) * 8) / Integer.parseInt(data[4]);
+        }
+        br.close();
+    }
+
     private void PrintResults(int[] a){
         System.out.println(Arrays.toString(a));
     }
