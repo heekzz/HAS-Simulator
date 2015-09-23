@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 
 /**
@@ -14,7 +12,11 @@ public class Simulator {
     public static void main (String args[]) throws IOException {
         Simulator sim = new Simulator();
         VideoPlayer player = new VideoPlayer();
-        sim.read("lol.log");
+        sim.read("log.log");
+        sim.setQuality(player);
+        sim.PrintResults(sim.requestedQuality);
+        sim.bufferOperation(player);
+        sim.PrintResults(player.bufferHistory);
     }
 
     public void read(String fileName) throws IOException{
@@ -26,6 +28,32 @@ public class Simulator {
             bandwidthHistory[index] = (Integer.parseInt(data[4]) * 8) / Integer.parseInt(data[4]);
         }
         br.close();
+    }
+
+    private void writeResults(VideoPlayer player,Simulator sim){
+        try {
+            //buffersize
+            BufferedWriter writer = new BufferedWriter(new FileWriter("/home/hughe531/TDDD66/input1.txt"));
+            //current quality
+            BufferedWriter writer2 = new BufferedWriter(new FileWriter("/home/hughe531/TDDD66/input2.txt"));
+            //requested quality
+            BufferedWriter writer3 = new BufferedWriter(new FileWriter("/home/hughe531/TDDD66/input3.txt"));
+            for (int i = 0; i < player.bufferHistory.length; i++) {
+                writer.write(i + " " + player.bufferHistory[i] + "\n");
+                if (i == 0) {
+                    writer2.write(i + " " + 0 + "\n");
+                }else
+                    writer2.write(i + " " +  sim.requestedQuality[i-1] +  "\n");
+                writer3.write(i + " " +sim.requestedQuality[i] + "\n");
+            }
+            writer.close();
+            writer2.close();
+            writer3.close();
+
+
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
     }
 
     private void PrintResults(int[] a){
@@ -86,10 +114,6 @@ public class Simulator {
             player.setCurrentBufSize(player.currentBufferSize - 1);
 
         }
-    }
-
-        private void writeResults(VideoPlayer player, Simulator sim){
-
     }
 
 }
