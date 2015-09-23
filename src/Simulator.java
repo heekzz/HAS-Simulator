@@ -55,41 +55,41 @@ public class Simulator {
             previousQuality = requestedQuality[i];
         }
     }
-    private void bufferOperation(VideoPlayer player){
+    private void bufferOperation(VideoPlayer player) {
         boolean currentlyDownloading = false;
         boolean waitForMinBuf = false;
         int currentBandwidth = 0;
         int currentFragmentSize = 0;
         fragment newfragment = null;
 
-        for (int i=0; i < requestedQuality.length; i++){
+        for (int i = 0; i < requestedQuality.length; i++) {
             currentBandwidth = bandwidthHistory[i];
-            player.bufferHistory[i] = player.currentBufSize;
+            player.bufferHistory[i] = player.currentBufferSize;
             int currentSize = player.getCurrentBufSize();
-            System.out.println("Current buffer size = " + player.currentBufSize);
+            System.out.println("Current buffer size = " + player.currentBufferSize);
 
-            if(currentSize > 6){
+            if (currentSize > 6) {
                 waitForMinBuf = true;
             }
-            if(currentlyDownloading == false && waitForMinBuf == false){
-                newfragment = (requestedQuality[i],4)
+            if (currentlyDownloading == false && waitForMinBuf == false) {
+                newfragment = new fragment(requestedQuality[i], 4);
                 currentlyDownloading = true;
             }
-            if(newfragment.getCurrentlyDownloaded() >= newfragment.getFragmentSize()){
+            if (newfragment.getCurrentlyDownloaded() >= newfragment.getFragmentSize()) {
                 player.setCurrentBufSize(currentSize + 4);
                 currentlyDownloading = false;
             }
-            if(currentlyDownloading){
-                newfragment.setCurrentlyDownloaded(currentBandwidth/newfragment.getQuality());
+            if (currentlyDownloading) {
+                newfragment.setCurrentlyDownloaded(currentBandwidth / newfragment.getQuality());
             }
 
-            player.setCurrentBufSize(player.currentBufSize -1);
+            player.setCurrentBufSize(player.currentBufferSize - 1);
 
         }
+    }
 
         private void writeResults(VideoPlayer player, Simulator sim){
 
     }
 
-    }
 }
