@@ -1,14 +1,14 @@
-/**
- * Created by dennisdufback on 15-09-23.
- */
+
 public class VideoPlayer {
-    int currentBufferSize;
+
+    int currentBufSize = 0;
     int[] bufferHistory = new int[565];
 
-    public int getBufferHistory(int i){
+    public int getBufferHistory(int i) {
         return bufferHistory[i];
     }
-    public void setBufferHistory(int i, int buf){
+
+    public void setBufferHistory(int i, int buf) {
         this.bufferHistory[i] = buf;
     }
 
@@ -23,17 +23,20 @@ public class VideoPlayer {
     }
 
     public int getCurrentBufSize() {
-        return currentBufferSize;
+        return currentBufSize;
     }
 
     public void setCurrentBufSize(int currentBufSize) {
-        this.currentBufferSize = currentBufSize;
+        this.currentBufSize = currentBufSize;
+    }
+
+    public void playFrame() {
+        currentBufSize--;
     }
 
     int maxBuf = 6;
     int minBuf = 4;
 
-    int playbackQuality = 0;
 
     //Method that sets the quality of the next packet that will be streamed
     //by checking the download speed of the previous packet.
@@ -51,4 +54,7 @@ public class VideoPlayer {
         }
         return currentBandwidth;
     }
+
+
+
 }

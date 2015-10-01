@@ -1,57 +1,62 @@
-/**
- * Created by dennisdufback on 15-09-23.
- */
-public class fragment {
-    private int fragmentsSize;
 
-        public int getFragmentSize(){
-            return fragmentsSize;
-        }
-    public void setFragmentsSize(int fragmentsSize){
-        this.fragmentsSize = fragmentsSize;
-    }
+public class Fragment {
+
+    private int fragmentSize;
     private int currentlyDownloaded;
     private int quality;
-    public int getQuality(){
-        return quality;
-    }
-    public void setQuality(int quality){
-        this.quality = quality;
-    }
     private boolean isDone;
 
-    public fragment(int quality, int size){
-        fragmentsSize = quality * size;
+
+
+
+    public Fragment(int quality){
         currentlyDownloaded = 0;
         isDone = false;
-        switch (quality){
+        switch (quality) {
             case 0:
-                quality = 250;
+                this.quality = 250;
                 break;
             case 1:
-                quality = 500;
+                this.quality = 500;
                 break;
             case 2:
-                quality = 850;
+                this.quality = 850;
                 break;
             case 3:
-                quality = 1300;
+                this.quality = 1300;
                 break;
             default:
                 break;
         }
+        fragmentSize = this.quality * 4;
     }
 
-    public int getCurrentlyDownloaded(){
+    public int getFragmentSize() {
+        return fragmentSize;
+    }
+
+    public void setQuality(int quality) {
+        this.quality = quality;
+    }
+
+    public int getQuality() {
+        return  quality;
+    }
+
+    public int getCurrentlyDownloaded() {
         return currentlyDownloaded;
     }
-    public void setCurrentlyDownloaded(int currentlyDownloaded){
+
+    public void setCurrentlyDownloaded(int currentlyDownloaded) {
         this.currentlyDownloaded = currentlyDownloaded;
     }
-    public boolean isDone(){
-        return isDone;
+
+    public boolean isDone() {
+        return currentlyDownloaded >= fragmentSize;
     }
-    public void setDone(boolean isDone){
+
+    public void setDone(boolean isDone) {
         this.isDone = isDone;
     }
+
 }
