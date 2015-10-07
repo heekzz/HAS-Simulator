@@ -13,6 +13,8 @@ public class Simulator {
 
     private int oldEst = 0;
     private final double alpha = 0.5;
+    private boolean currentlyDownloading;
+    private int previousQuality = -1;
 
 
 
@@ -28,6 +30,7 @@ public class Simulator {
             index++;
         }
         br.close();
+
     }
 
     private void PrintResults(int [] a) {
@@ -50,18 +53,32 @@ public class Simulator {
 
     //Method that sets the quality of the streaming.
     //It makes it only possible to change the streaming one step up and one or two steps down.
-    private void setQuality(VideoPlayer player) {
-        int previousQuality = -1;
-        for (int i = 0; i < bandwidthHistory.length; i++) {
-            if (player.checkQuality(bandwidthHistory[i]) > previousQuality){
-                requestedQuality[i] = previousQuality + 1;
-            }else if (player.checkQuality(bandwidthHistory[i]) < previousQuality - 2) {
-                requestedQuality[i] = previousQuality - 2;
-            } else {
-                requestedQuality[i] = player.checkQuality(bandwidthHistory[i]);
-            }
-            previousQuality = requestedQuality[i];
+//    private void setQuality(VideoPlayer player) {
+//        int previousQuality = -1;
+//        for (int i = 0; i < bandwidthHistory.length; i++) {
+//            if (player.checkQuality(bandwidthHistory[i]) > previousQuality){
+//                requestedQuality[i] = previousQuality + 1;
+//            }else if (player.checkQuality(bandwidthHistory[i]) < previousQuality - 2) {
+//                requestedQuality[i] = previousQuality - 2;
+//            } else {
+//                requestedQuality[i] = player.checkQuality(bandwidthHistory[i]);
+//            }
+//            previousQuality = requestedQuality[i];
+//        }
+//    }
+
+    private Fragment requestNewFragment(int index, VideoPlayer player) {
+        if (player.checkQuality(bandwidthHistory[index]) > previousQuality){
+            requestedQuality[index] = previousQuality + 1;
+        }else if (player.checkQuality(bandwidthHistory[index]) < previousQuality - 2) {
+            requestedQuality[index] = previousQuality - 2;
+        } else {
+            requestedQuality[index] = player.checkQuality(bandwidthHistory[index]);
         }
+        previousQuality = requestedQuality[index];
+        Fragment fragment = new Fragment(requestedQuality[index]);
+        currentlyDownloading = true;
+        return fragment;
     }
 
     //Method that determines if the streaming is going to pause or play by looking at the buffersize.
@@ -69,15 +86,19 @@ public class Simulator {
     //If the buffer is bigger than 4 but less than 6 the streaming will play and download another packet.
     //However, if the buffer is bigger than 6 the streaming will play but it will NOT download/request another packet.
 
-    private void bufferOperation(VideoPlayer player){
+    private void bufferOperation(VideoPlayer player) throws IOException {
+        //buffersize
+        BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/Fredrik/Desktop/TDDD66/input1.txt"));
+        //current quality
+        BufferedWriter writer2 = new BufferedWriter(new FileWriter("/Users/Fredrik/Desktop/TDDD66/input2.txt"));
+        //requested quality
+        BufferedWriter writer3 = new BufferedWriter(new FileWriter("/Users/Fredrik/Desktop/TDDD66/input3.txt"));
 
         boolean waitForMinBuf = false;
         int currentBandwidth = 0;
-//        int currentFragmentSize = 0;
-//        int fragmentDownloaded = 0;
         int currentBuffSize = 0;
         Fragment newFragment = null;
-        boolean currentlyDownloading = false;
+        currentlyDownloading = false;
 
         for (int i = 0; i < bandwidthHistory.length; i++) {
             currentBandwidth = bandwidthHistory[i];
@@ -89,8 +110,10 @@ public class Simulator {
 
             // Request a new fragment
             if (currentBuffSize < player.maxBuf && !currentlyDownloading) {
-                newFragment = new Fragment(requestedQuality[i]);
-                currentlyDownloading = true;
+                newFragment = requestNewFragment(i, player);
+                writer3.write(i + " " + requestedQuality[i] + "\n");
+            } else {
+                writer3.write(i + " \n" );
             }
 
             if(currentlyDownloading) {
@@ -112,75 +135,30 @@ public class Simulator {
                 waitForMinBuf = false;
             }
 
-//            System.out.println("Current Buffer: " +  currentBuffSize);
-//            System.out.println("Current requested quality: " + requestedQuality[i]);
+            requestedQuality[i] = previousQuality;
 
-//            player.bufferHistory[i] = player.currentBufSize;
-//            int currentSize = player.getCurrentBufSize();
-//            System.out.println("Current buffer size = " + player.currentBufSize);
-//
-//            if(currentSize > 6)
-//                waitForMinBuf = true;
-//
-//            if(currentlyDownloading == false && waitForMinBuf == false){
-//                newfragment = new Fragment(requestedQuality[i],4);
-//                currentlyDownloading = true;
-//            }
-//            if(newfragment.getCurrentlyDownloaded() >= newfragment.getFragmentSize()){
-//                player.setCurrentBufSize(currentSize +4);
-//                currentlyDownloading = false;
-//            }
-//            if(currentlyDownloading){
-//                newfragment.setCurrentlyDownloaded(newfragment.getCurrentlyDownloaded() + currentBandwidth);
-//
-//            }
-//            System.out.println("Current bandwidth: " + currentBandwidth);
-//            System.out.println("Currently Downloaded: " + newfragment.getCurrentlyDownloaded());
-//            //System.out.println("Fragment size: "+newfragment.getFragmentSize());
-//
-//
-//            if(player.currentBufSize != 0)
-//                player.setCurrentBufSize(player.currentBufSize - 1);
-//
-
+            // Write down result
+            writer.write(i + " " + player.bufferHistory[i] + "\n");
+            writer2.write(i + " " + player.checkQuality(newFragment.getQuality()) + "\n");
+//            if(i == 0)
+//                writer3.write(i + " " + requestedQuality[i] + "\n");
         }
-    }
 
-    private void writeResults(VideoPlayer player, Simulator sim){
-        try {
-            //buffersize
-            BufferedWriter writer = new BufferedWriter(new FileWriter("/Users/Fredrik/Desktop/TDDD66/input1.txt"));
-            //current quality
-            BufferedWriter writer2 = new BufferedWriter(new FileWriter("/Users/Fredrik/Desktop/TDDD66/input2.txt"));
-            //requested quality
-            BufferedWriter writer3 = new BufferedWriter(new FileWriter("/Users/Fredrik/Desktop/TDDD66/input3.txt"));
-            for (int i = 0; i < player.bufferHistory.length; i++) {
-                writer.write(i + " " + player.bufferHistory[i] + "\n");
-                if (i == 0) {
-                    writer2.write(i + " " + 0 + "\n");
-                }else
-                    writer2.write(i + " " +  sim.requestedQuality[i-1] +  "\n");
-                writer3.write(i + " " +sim.requestedQuality[i] + "\n");
-            }
-            writer.close();
-            writer2.close();
-            writer3.close();
-
-
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
+        writer.close();
+        writer2.close();
+        writer3.close();
     }
 
     public static void main(String[] args) throws IOException {
         Simulator sim = new Simulator();
         VideoPlayer player = new VideoPlayer();
         sim.read("log.log");
-        sim.setQuality(player);
-        sim.PrintResults(sim.requestedQuality);
+//        sim.setQuality(player);
         sim.bufferOperation(player);
+        sim.PrintResults(sim.bandwidthHistory);
+        sim.PrintResults(sim.requestedQuality);
         sim.PrintResults(player.bufferHistory);
-        sim.writeResults(player, sim);
+//        sim.writeResults(player, sim);
     }
 
 }
